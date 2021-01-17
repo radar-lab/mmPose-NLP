@@ -1,0 +1,30 @@
+<!--
+	This file will launch a TI mmWave sensor
+-->
+
+<launch>
+	<!-- Input arguments -->
+	<arg name="device_number"/>
+
+	<arg name="max_allowed_elevation_angle_deg" value="90" doc="Maximum allowed elevation angle in degrees for detected object data [0 > value >= 90]}"/>
+	<arg name="max_allowed_azimuth_angle_deg" value="90" doc="Maximum allowed azimuth angle in degrees for detected object data [0 > value >= 90]}"/>
+
+	<!-- mmWave_Manager node -->
+	<node pkg="multiradar_mmpose" type="multiradar_mmpose" name="mmWave_Manager_$(arg device_number)" output="screen">
+		<param name="device_number" value="$(arg device_number)"/>
+		<param name="command_port" value="/dev/ttyACM2"/>
+		<param name="command_rate" value="115200"/>
+		<param name="data_port" value="/dev/ttyACM3"/>
+		<param name="data_rate" value="921600"/>
+		<param name="max_allowed_elevation_angle_deg" value="$(arg max_allowed_elevation_angle_deg)"/>
+		<param name="max_allowed_azimuth_angle_deg" value="$(arg max_allowed_azimuth_angle_deg)"/>
+	</node>
+
+	<!-- mmWaveQuickConfig node (terminates after configuring mmWave sensor) -->
+	<node pkg="multiradar_mmpose" type="mmWaveQuickConfig" name="mmWaveQuickConfig_$(arg device_number)" args="$(find multiradar_mmpose)/cfg/radar_$(arg device_number)_3.cfg" output="screen"/>
+
+	<!-- Static transform from map to base_radar_link for visualization of stand-alone mmWave sensor using Rviz -->
+	<!-- <node pkg="tf" type="static_transform_publisher" name="static_tf_map_to_base_radar_link" args="0 0 0 0 0 0 map base_radar_link 100"/> -->
+	<!-- <node pkg="tf" type="static_transform_publisher" name="static_tf_map_to_base_radar_link_$(arg device_number)" args="0 0 0 0 0 0 map ti_$(arg device_number)_frame 100"/> -->
+
+</launch>
